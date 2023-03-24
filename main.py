@@ -61,6 +61,7 @@ class Ship:
         self.ship_img = None
         self.laser_img = None
         self.lasers = []
+        self.color = None
         self.cool_down_counter = 0
 
     def draw(self, window):
@@ -115,8 +116,22 @@ class Player(Ship):
             else:
                 for obj in objs:
                     if laser.collision(obj):
-                        # print(obj.)
-                        obj.health -= 100
+                        if self.laser == 1:
+                            if obj.color == "red":
+                                obj.health -= 150
+                            elif obj.color == "black":
+                                obj.health -= 100
+                            else:
+                                obj.health -= 50
+                        elif self.laser == 2:
+                            if obj.color == "red":
+                                obj.health -= 100
+                            elif obj.color == "black":
+                                obj.health -= 200
+                            else:
+                                obj.health -= 50
+                        elif self.laser == 3:
+                            obj.health -= 100
                         if obj.health <= 0:
                             objs.remove(obj)
                         if laser in self.lasers:
@@ -158,6 +173,7 @@ class Enemy(Ship):
         elif color == "white":
             health = 100
         super().__init__(x, y, health)
+        self.color = color
         self.ship_img, self.laser_img = self.COLOR_MAP[color]
         self.mask = pygame.mask.from_surface(self.ship_img)
 
