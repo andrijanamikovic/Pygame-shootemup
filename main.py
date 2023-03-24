@@ -8,6 +8,7 @@ pygame.font.init()
 WIDTH, HEIGHT = 750, 750
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Grogu")
+pygame.init()
 
 # Load images
 RED_ENEMY = pygame.image.load(os.path.join("assets", "red_enemy.png"))
@@ -101,6 +102,7 @@ class Player(Ship):
         super().__init__(x, y, health)
         self.ship_img = BABY_YODA
         self.laser_img = YELLOW_LASER
+        self.laser = 0
         self.mask = pygame.mask.from_surface(self.ship_img)
         self.max_health = health
 
@@ -113,6 +115,7 @@ class Player(Ship):
             else:
                 for obj in objs:
                     if laser.collision(obj):
+                        # print(obj.)
                         obj.health -= 100
                         if obj.health <= 0:
                             objs.remove(obj)
@@ -126,6 +129,18 @@ class Player(Ship):
     def healthbar(self, window):
         pygame.draw.rect(window, (255,0,0), (self.x, self.y + self.ship_img.get_height() + 10, self.ship_img.get_width(), 10))
         pygame.draw.rect(window, (0,255,0), (self.x, self.y + self.ship_img.get_height() + 10, self.ship_img.get_width() * (self.health/self.max_health), 10))
+
+    def change_laser_color(self, laser_img_color):
+        if laser_img_color == "Red":
+            self.laser_img = RED_LASER
+            self.laser = 1
+        elif laser_img_color == "Black":
+            self.laser_img = GREEN_LASER
+            self.laser = 2
+        elif laser_img_color == "White":
+            self.laser_img = BLUE_LASER
+            self.laser = 3
+
 
 
 class Enemy(Ship):
@@ -161,7 +176,7 @@ def collide(obj1, obj2):
     offset_y = obj2.y - obj1.y
     return obj1.mask.overlap(obj2.mask, (offset_x, offset_y)) != None
 
-def main():
+def main(selected_weapon):
     run = True
     FPS = 90
     level = 0
@@ -182,6 +197,7 @@ def main():
 
     lost = False
     lost_count = 0
+    player.change_laser_color(selected_weapon)
 
     def redraw_window():
         WIN.blit(BG, (0,0))
@@ -255,10 +271,39 @@ def main():
                 enemies.remove(enemy)
 
         player.move_lasers(-laser_vel, enemies)
-
+def select_weapon(weapons, selected_weapon):
+    print("Selected: ", selected_weapon, "weapons: ", weapons)
+    print("You selected ",selected_weapon, "Demage: ", weapons.get(selected_weapon))
+    main(selected_weapon)
 def main_menu():
     title_font = pygame.font.SysFont("comicsans", 70)
+
     run = True
+    weapons = {
+        'Red': {
+            'damage-red': 200,
+            'damage-black': 100,
+            'damage-white': 50
+        },
+        'Black': {
+            'damage-red': 100,
+            'damage-black': 200,
+            'damage-white': 50
+        },
+        'White': {
+            'damage-red': 50,
+            'damage-black': 100,
+            'damage-white': 200
+        }
+    }
+
+    menu_theme = pygame_menu.themes.THEME_DARK
+    menu = pygame_menu.Menu("Select a weapon", 300,300, theme=menu_theme)
+    menu.disable()
+    for weapon_name in weapons.keys():
+        print("weapon_name: ", weapon_name)
+        menu.add.button(weapon_name, select_weapon, weapons, weapon_name)
+
     while run:
         WIN.blit(BG, (0,0))
         title_label = title_font.render("Press the mouse to begin...", 1, (255,255,255))
@@ -268,7 +313,9 @@ def main_menu():
             if event.type == pygame.QUIT:
                 run = False
             if event.type == pygame.MOUSEBUTTONDOWN:
-                main()
+                menu.enable()
+                menu.mainloop(WIN)
+    pygame.display.update()
     pygame.quit()
 
 
