@@ -1,4 +1,5 @@
 import pygame
+import pygame_menu
 import os
 import time
 import random
@@ -9,16 +10,16 @@ WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Grogu")
 
 # Load images
-RED_SPACE_SHIP = pygame.image.load(os.path.join("assets", "pixel_ship_red_small.png"))
-RED_SPACE_SHIP = pygame.transform.scale(RED_SPACE_SHIP, (50, 50))
-GREEN_SPACE_SHIP = pygame.image.load(os.path.join("assets", "pixel_ship_green_small.png"))
-GREEN_SPACE_SHIP = pygame.transform.scale(GREEN_SPACE_SHIP, (50, 50))
-BLUE_SPACE_SHIP = pygame.image.load(os.path.join("assets", "pixel_ship_blue_small.png"))
-BLUE_SPACE_SHIP = pygame.transform.scale(BLUE_SPACE_SHIP, (50, 50))
+RED_ENEMY = pygame.image.load(os.path.join("assets", "red_enemy.png"))
+RED_ENEMY = pygame.transform.scale(RED_ENEMY, (50, 50))
+BLACK_ENEMY = pygame.image.load(os.path.join("assets", "black_enemy.png"))
+BLACK_ENEMY = pygame.transform.scale(BLACK_ENEMY, (50, 50))
+WHITE_ENEMY = pygame.image.load(os.path.join("assets", "white_enemy.png"))
+WHITE_ENEMY = pygame.transform.scale(WHITE_ENEMY, (50, 50))
 
 # Player player
-YELLOW_SPACE_SHIP = pygame.image.load(os.path.join("assets", "pixel_ship_yellow.png"))
-YELLOW_SPACE_SHIP = pygame.transform.scale(YELLOW_SPACE_SHIP, (100, 100))
+BABY_YODA = pygame.image.load(os.path.join("assets", "baby_yoda.png"))
+BABY_YODA = pygame.transform.scale(BABY_YODA, (100, 100))
 
 # Lasers
 RED_LASER = pygame.image.load(os.path.join("assets", "pixel_laser_red.png"))
@@ -98,7 +99,7 @@ class Ship:
 class Player(Ship):
     def __init__(self, x, y, health=100):
         super().__init__(x, y, health)
-        self.ship_img = YELLOW_SPACE_SHIP
+        self.ship_img = BABY_YODA
         self.laser_img = YELLOW_LASER
         self.mask = pygame.mask.from_surface(self.ship_img)
         self.max_health = health
@@ -112,7 +113,9 @@ class Player(Ship):
             else:
                 for obj in objs:
                     if laser.collision(obj):
-                        objs.remove(obj)
+                        obj.health -= 100
+                        if obj.health <= 0:
+                            objs.remove(obj)
                         if laser in self.lasers:
                             self.lasers.remove(laser)
 
@@ -127,12 +130,18 @@ class Player(Ship):
 
 class Enemy(Ship):
     COLOR_MAP = {
-                "red": (RED_SPACE_SHIP, RED_LASER),
-                "green": (GREEN_SPACE_SHIP, GREEN_LASER),
-                "blue": (BLUE_SPACE_SHIP, BLUE_LASER)
+                "red": (RED_ENEMY, RED_LASER),
+                "black": (BLACK_ENEMY, GREEN_LASER),
+                "white": (WHITE_ENEMY, BLUE_LASER)
                 }
 
     def __init__(self, x, y, color, health=100):
+        if color == "red":
+            health = 300
+        elif color == "black":
+            health = 200
+        elif color == "white":
+            health = 100
         super().__init__(x, y, health)
         self.ship_img, self.laser_img = self.COLOR_MAP[color]
         self.mask = pygame.mask.from_surface(self.ship_img)
@@ -212,7 +221,7 @@ def main():
             level += 1
             wave_length += 5
             for i in range(wave_length):
-                enemy = Enemy(random.randrange(50, WIDTH-100), random.randrange(-1500, -100), random.choice(["red", "blue", "green"]))
+                enemy = Enemy(random.randrange(50, WIDTH-100), random.randrange(-1500, -100), random.choice(["red", "black", "white"]))
                 enemies.append(enemy)
 
         for event in pygame.event.get():
