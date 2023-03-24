@@ -107,17 +107,7 @@ class Agent(BaseSprite):
         pass
 
 
-class ExampleAgent(Agent):
-    def __init__(self, x, y, file_name):
-        super().__init__(x, y, file_name)
-
-    def get_agent_path(self, coin_distance):
-        path = [i for i in range(1, len(coin_distance))]
-        random.shuffle(path)
-        return [0] + path + [0]
-
-
-class Aki(Agent):
+class black(Agent):
     def __init__(self, x, y, file_name):
         super().__init__(x, y, file_name)
 
@@ -141,7 +131,7 @@ class Aki(Agent):
         return path + [0]
 
 
-class Jocke(Agent):
+class Yoda(Agent):
     def __init__(self, x, y, file_name):
         super().__init__(x, y, file_name)
 
@@ -163,7 +153,7 @@ class Jocke(Agent):
         return [0] + path + [0]
 
 
-class Uki(Agent):
+class red(Agent):
     def __init__(self, x, y, file_name):
         super().__init__(x, y, file_name)
 
@@ -189,7 +179,7 @@ class Uki(Agent):
         return path + [0]
 
 
-class Micko(Agent):
+class white(Agent):
     def __init__(self, x, y, file_name):
         super().__init__(x, y, file_name)
 
