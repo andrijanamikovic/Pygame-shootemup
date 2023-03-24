@@ -34,7 +34,7 @@ class Surface(BaseSprite):
 class Coin(BaseSprite):
     def __init__(self, x, y, ident):
         self.ident = ident
-        super(Coin, self).__init__(x, y, 'coin.png', config.DARK_GREEN)
+        super(Coin, self).__init__(x, y, 'coin.png', config.BLACK)
 
     def get_ident(self):
         return self.ident
@@ -51,7 +51,7 @@ class Coin(BaseSprite):
 class CollectedCoin(BaseSprite):
     def __init__(self, coin):
         self.ident = coin.ident
-        super(CollectedCoin, self).__init__(coin.rect.x, coin.rect.y, 'collected_coin.png', config.DARK_GREEN)
+        super(CollectedCoin, self).__init__(coin.rect.x, coin.rect.y, 'collected_coin.png', config.BLACK)
 
     def draw(self, screen):
         text = config.COIN_FONT.render(f'{self.ident}', True, config.RED)
@@ -61,7 +61,7 @@ class CollectedCoin(BaseSprite):
 
 class Agent(BaseSprite):
     def __init__(self, x, y, file_name):
-        super(Agent, self).__init__(x, y, file_name, config.DARK_GREEN)
+        super(Agent, self).__init__(x, y, file_name, config.BLACK)
         self.x = self.rect.x
         self.y = self.rect.y
         self.step = None
