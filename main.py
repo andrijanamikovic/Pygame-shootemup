@@ -170,6 +170,24 @@ class Player(Ship):
                             objs.remove(obj)
                         if laser in self.lasers:
                             self.lasers.remove(laser)
+<<<<<<< Updated upstream
+=======
+                for ast in asts:
+                    # if ast.off_screen(HEIGHT):
+                    #     asts.remove(ast)
+                    #     print("Removed")
+                    #     self.health = 0
+                    if laser.collision(ast):
+                        print("Health: ", ast.health)
+                        ast.health -= 100
+                        print("collied")
+                        if ast.health <= 0:
+                            print("Removed")
+                            asts.remove(ast)
+                        if laser in self.lasers:
+                            self.lasers.remove(laser)
+                    
+>>>>>>> Stashed changes
 
     def draw(self, window, health):
         super().draw(window)
@@ -339,6 +357,7 @@ def main():
         if len(enemies) == 0:
             level += 1
             wave_length += 2
+            asteroid_wave_length += 1
             for i in range(wave_length):
                 enemy = Enemy(random.randrange(50, WIDTH - 100), random.randrange(-1500, -100),
                               random.choice(["red", "black", "white"]))
@@ -368,6 +387,21 @@ def main():
         if keys[pygame.K_SPACE]:
             player.shoot()
 
+<<<<<<< Updated upstream
+=======
+        for asteroid in asteroids[:]:
+            asteroid.move(asteroid_vel)
+
+            if collide(asteroid, player):
+                player.health = 0
+                lives = 0
+                asteroids.remove(asteroid)
+            elif asteroid.y + asteroid.get_height() > HEIGHT:
+                lives = 0
+                player.health = 0
+                asteroids.remove(asteroid)
+
+>>>>>>> Stashed changes
         for enemy in enemies[:]:
             enemy.move(enemy_vel)
             enemy.move_lasers(laser_vel, player)
