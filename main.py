@@ -433,7 +433,6 @@ def main_menu():
 
     menu.disable()
     for weapon_name in weapons.keys():
-        print("weapon_name: ", weapon_name)
         img_name = str(weapon_name).lower() + '_gun.png'
         PATH = os.path.join("assets", img_name)
         menu.add.image(PATH, angle=0, scale=(0.35, 0.35), scale_smooth=True)
