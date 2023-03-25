@@ -181,8 +181,8 @@ def main(selected_weapon):
     FPS = 90
     level = 0
     lives = 5
-    main_font = pygame.font.SysFont("comicsans", 50)
-    lost_font = pygame.font.SysFont("comicsans", 60)
+    main_font = pygame.font.SysFont("arial", 50)
+    lost_font = pygame.font.SysFont("arial", 60)
 
     enemies = []
     wave_length = 5
@@ -276,7 +276,7 @@ def select_weapon(weapons, selected_weapon):
     print("You selected ",selected_weapon, "Demage: ", weapons.get(selected_weapon))
     main(selected_weapon)
 def main_menu():
-    title_font = pygame.font.SysFont("comicsans", 70)
+    title_font = pygame.font.SysFont("arial", 40)
 
     run = True
     weapons = {
@@ -298,10 +298,16 @@ def main_menu():
     }
 
     menu_theme = pygame_menu.themes.THEME_DARK
-    menu = pygame_menu.Menu("Select a weapon", 300,300, theme=menu_theme)
+    menu_width = 500
+    menu_height = 500
+    #my_theme = pygame_menu.themes.Theme(background_color=(255, 255, 255, 255))
+    menu = pygame_menu.Menu("Choose one", menu_width, menu_height, theme=menu_theme)
     menu.disable()
     for weapon_name in weapons.keys():
         print("weapon_name: ", weapon_name)
+        img_name = str(weapon_name).lower() + '_gun.png'
+        PATH = os.path.join("assets", img_name)
+        menu.add.image(PATH, angle=0, scale=(0.35, 0.35), scale_smooth=True)
         menu.add.button(weapon_name, select_weapon, weapons, weapon_name)
 
     while run:
