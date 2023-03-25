@@ -34,6 +34,9 @@ BG = pygame.transform.scale(pygame.image.load(os.path.join("assets", "background
 menu_theme = pygame_menu.themes.THEME_DARK
 menu = pygame_menu.Menu("Select a weapon", 300, 300, theme=menu_theme)
 
+# Health
+HEALTH = pygame.image.load(os.path.join("assets", "6-pixel-heart-1.png"))
+HEALTH = pygame.transform.scale(HEALTH, (70, 70))
 
 class Laser:
     def __init__(self, x, y, img):
@@ -54,6 +57,25 @@ class Laser:
     def collision(self, obj):
         return collide(self, obj)
 
+
+class Health:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.img = HEALTH
+        self.mask = pygame.mask.from_surface(self.img)
+
+    def draw(self, window):
+        window.blit(self.img, (self.x, self.y))
+
+    def move(self, vel):
+        self.y += vel
+
+    def off_screen(self, height):
+        return not (self.y <= height and self.y >= 0)
+
+    def collision(self, obj):
+        return collide(self, obj)
 
 class Ship:
     COOLDOWN = 30
@@ -202,11 +224,13 @@ def collide(obj1, obj2):
 level = 0
 lives = 5
 enemies = []
+healths = []
 wave_length = 5
 enemy_vel = 1
 
 player_vel = 5
 laser_vel = 5
+health_vel = 0
 player = Player(300, 630)
 
 lost = False
@@ -218,8 +242,10 @@ def main():
     global level
     global lives
     global enemies
+    global healths
     global wave_length
     global enemy_vel
+    global health_vel
     global lost
     global lost_count
     global player_vel
@@ -233,6 +259,10 @@ def main():
         enemies = []
         wave_length = 5
         enemy_vel = 1
+
+        healths = []
+        health_wave_length = 1
+        health_vel = 1
 
         player_vel = 5
         laser_vel = 5
@@ -260,6 +290,9 @@ def main():
 
         for enemy in enemies:
             enemy.draw(WIN)
+
+        for health in healths:
+            health.draw(WIN)
 
         player.draw(WIN, player.health)
 
@@ -292,6 +325,10 @@ def main():
                 enemy = Enemy(random.randrange(50, WIDTH - 100), random.randrange(-1500, -100),
                               random.choice(["red", "black", "white"]))
                 enemies.append(enemy)
+            # Health
+            for j in range(health_wave_length):
+                health = Health(random.randrange(50, WIDTH-100), random.randrange(-1500, -100))
+                healths.append(health)
             if level != 1:
                 choose_new_weapon()
 
@@ -326,6 +363,24 @@ def main():
             elif enemy.y + enemy.get_height() > HEIGHT:
                 lives -= 1
                 enemies.remove(enemy)
+
+        for health in healths[:]:
+            health.move(health_vel)
+            # enemy.move_lasers(laser_vel, player)
+
+            # if random.randrange(0, 2*60) == 1:
+            #     enemy.shoot()
+
+            if collide(health, player):
+                # player.health += 30
+                if player.health + 30 > 100:
+                    player.health = 100
+                elif player.health + 30 <= 100:
+                    player.health += 30
+                healths.remove(health)
+            # elif enemy.y + enemy.get_height() > HEIGHT:
+            #     lives -= 1
+            #     enemies.remove(enemy)
 
         player.move_lasers(-laser_vel, enemies)
 
