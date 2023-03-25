@@ -313,7 +313,7 @@ def main():
         player.draw(WIN, player.health)
 
         if lost:
-            lost_label = lost_font.render("You Lost!!", 1, (255, 255, 255))
+            lost_label = lost_font.render("Game over!", 1, (255, 255, 255))
             WIN.blit(lost_label, (WIDTH / 2 - lost_label.get_width() / 2, 350))
 
         pygame.display.update()
@@ -384,10 +384,6 @@ def main():
 
         for health in healths[:]:
             health.move(health_vel)
-            # enemy.move_lasers(laser_vel, player)
-
-            # if random.randrange(0, 2*60) == 1:
-            #     enemy.shoot()
 
             if collide(health, player):
                 # player.health += 30
@@ -398,9 +394,6 @@ def main():
                 if lives < 5:
                     lives += 1
                 healths.remove(health)
-            # elif enemy.y + enemy.get_height() > HEIGHT:
-            #     lives -= 1
-            #     enemies.remove(enemy)
 
         player.move_lasers(-laser_vel, enemies)
 
@@ -442,7 +435,13 @@ def main_menu():
         img_name = str(weapon_name).lower() + '_gun.png'
         PATH = os.path.join("assets", img_name)
         menu.add.image(PATH, angle=0, scale=(0.35, 0.35), scale_smooth=True)
-        menu.add.button(weapon_name, select_weapon, weapons, weapon_name)
+        if weapon_name == "Black":
+            name = "Green bullets"
+        elif weapon_name == "White":
+            name = "Blue bullets"
+        else:
+            name = "Red bullets"
+        menu.add.button(name, select_weapon, weapons, weapon_name)
 
     while run:
         WIN.blit(BG, (0, 0))
