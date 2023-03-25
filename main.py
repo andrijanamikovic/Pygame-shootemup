@@ -12,11 +12,11 @@ pygame.display.set_caption("Grogu")
 pygame.init()
 
 # Load images
-RED_ENEMY = pygame.image.load(os.path.join("assets", "red_enemy.png"))
+RED_ENEMY = pygame.image.load(os.path.join("assets", "red_enemy_r.png"))
 RED_ENEMY = pygame.transform.scale(RED_ENEMY, (50, 50))
-BLACK_ENEMY = pygame.image.load(os.path.join("assets", "black_enemy.png"))
+BLACK_ENEMY = pygame.image.load(os.path.join("assets", "black_enemy_r.png"))
 BLACK_ENEMY = pygame.transform.scale(BLACK_ENEMY, (50, 50))
-WHITE_ENEMY = pygame.image.load(os.path.join("assets", "white_enemy.png"))
+WHITE_ENEMY = pygame.image.load(os.path.join("assets", "white_enemy_r.png"))
 WHITE_ENEMY = pygame.transform.scale(WHITE_ENEMY, (50, 50))
 
 # Player player
@@ -24,13 +24,17 @@ BABY_YODA = pygame.image.load(os.path.join("assets", "baby_yoda.png"))
 BABY_YODA = pygame.transform.scale(BABY_YODA, (100, 100))
 
 # Lasers
-RED_LASER = pygame.image.load(os.path.join("assets", "pixel_laser_red.png"))
-GREEN_LASER = pygame.image.load(os.path.join("assets", "pixel_laser_green.png"))
-BLUE_LASER = pygame.image.load(os.path.join("assets", "pixel_laser_blue.png"))
-YELLOW_LASER = pygame.image.load(os.path.join("assets", "pixel_laser_yellow.png"))
+RED_LASER = pygame.image.load(os.path.join("assets", "red_laser_r.png"))
+RED_LASER = pygame.transform.scale(RED_LASER, (100,30))
+GREEN_LASER = pygame.image.load(os.path.join("assets", "green_laser_r.png"))
+GREEN_LASER = pygame.transform.scale(GREEN_LASER, (100,30))
+BLUE_LASER = pygame.image.load(os.path.join("assets", "blue_laser_r.png"))
+BLUE_LASER = pygame.transform.scale(BLUE_LASER, (100,30))
+YELLOW_LASER = pygame.image.load(os.path.join("assets", "yellow_laser_r.png"))
+YELLOW_LASER = pygame.transform.scale(YELLOW_LASER, (100,30))
 
 # Background
-BG = pygame.transform.scale(pygame.image.load(os.path.join("assets", "background-black.png")), (WIDTH, HEIGHT))
+BG = pygame.transform.scale(pygame.image.load(os.path.join("assets", "space.jpg")), (WIDTH, HEIGHT))
 menu_theme = pygame_menu.themes.THEME_DARK
 menu = pygame_menu.Menu("Select a weapon", 300, 300, theme=menu_theme)
 
@@ -231,6 +235,7 @@ enemy_vel = 1
 player_vel = 5
 laser_vel = 5
 health_vel = 0
+health_wave_length = 1 #
 player = Player(300, 630)
 
 lost = False
@@ -244,6 +249,7 @@ def main():
     global enemies
     global healths
     global wave_length
+    global health_wave_length #
     global enemy_vel
     global health_vel
     global lost
