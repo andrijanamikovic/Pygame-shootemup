@@ -43,7 +43,9 @@ menu = pygame_menu.Menu("Choose one", menu_width, menu_height, theme=menu_theme)
 # Health
 HEALTH = pygame.image.load(os.path.join("assets", "6-pixel-heart-1.png"))
 HEALTH = pygame.transform.scale(HEALTH, (70, 70))
-
+#Asteroid 
+ASTEROID = pygame.image.load(os.path.join("assets", "asteroid.png"))
+ASTEROID = pygame.transform.scale(ASTEROID, (70, 70))
 HIGH_SCORE = 0
 
 class Laser:
@@ -84,6 +86,35 @@ class Health:
 
     def collision(self, obj):
         return collide(self, obj)
+    
+class Asteroid:
+    def __init__(self, x, y, health = 500):
+        self.x = x
+        self.y = y
+        self.img = ASTEROID
+        self.mask = pygame.mask.from_surface(self.img)
+        self.health = health
+
+    def draw(self, window):
+        window.blit(self.img, (self.x, self.y))
+
+    def move(self, vel):
+        self.y += vel
+
+    def update_health(self):
+        self.health -= 100
+
+    def off_screen(self, height):
+        return not (self.y <= height and self.y >= 0)
+
+    def collision(self, obj):
+        return collide(self, obj)
+    
+    def get_width(self):
+        return self.img.get_width()
+
+    def get_height(self):
+        return self.img.get_height()
 
 class Ship:
     COOLDOWN = 30
@@ -113,6 +144,7 @@ class Ship:
                 obj.health -= 10
                 self.lasers.remove(laser)
 
+
     def cooldown(self):
         if self.cool_down_counter >= self.COOLDOWN:
             self.cool_down_counter = 0
@@ -141,7 +173,7 @@ class Player(Ship):
         self.mask = pygame.mask.from_surface(self.ship_img)
         self.max_health = health
 
-    def move_lasers(self, vel, objs):
+    def move_lasers(self, vel, objs, asts):
         self.cooldown()
         for laser in self.lasers:
             laser.move(vel)
@@ -166,10 +198,21 @@ class Player(Ship):
                                 obj.health -= 50
                         elif self.laser == 3:
                             obj.health -= 100
+                        
                         if obj.health <= 0:
                             objs.remove(obj)
                         if laser in self.lasers:
                             self.lasers.remove(laser)
+                for ast in asts:
+                    if ast.off_screen(HEIGHT):
+                        asts.remove(ast)
+                        self.health = 0
+                    if laser.collision(ast):
+                        ast.health -= 100
+                        if ast.health <= 0:
+                            asts.remove(ast)
+                        
+                    
 
     def draw(self, window, health):
         super().draw(window)
@@ -253,14 +296,17 @@ def main():
     global lives
     global enemies
     global healths
+    global asteroids
     global wave_length
     global health_wave_length #
+    global asteroid_wave_length
     global enemy_vel
     global health_wave_length
     global health_vel
     global lost
     global lost_count
     global player_vel
+    global asteroid_vel
     global laser_vel
     global player
     global HIGH_SCORE
@@ -277,6 +323,10 @@ def main():
         health_wave_length = 1
         health_vel = 1
 
+        asteroids = []
+        asteroid_wave_length = 1
+        asteroid_vel = 1
+
         player_vel = 5
         laser_vel = 5
 
@@ -284,8 +334,8 @@ def main():
         lost_count = 0
         init = True
 
-    main_font = pygame.font.SysFont("arial", 40)
-    lost_font = pygame.font.SysFont("arial", 40)
+    main_font = pygame.font.SysFont("Verdana", 20)
+    lost_font = pygame.font.SysFont("arial", 20)
     clock = pygame.time.Clock()
     player.change_laser_color(weapon)
 
@@ -295,6 +345,9 @@ def main():
 
     def redraw_window():
         WIN.blit(BG, (0, 0))
+        screen_header = pygame.Rect(0, 0, WIDTH, 40)
+        pygame.draw.rect(WIN, (0,0,0), screen_header)
+        
         # draw text
         lives_label = main_font.render(f"Enemies to miss: {lives}", 1, (255, 255, 255))
         level_label = main_font.render(f"Level: {level}", 1, (255, 255, 255))
@@ -309,11 +362,15 @@ def main():
 
         for health in healths:
             health.draw(WIN)
+        
+        for asteroid in asteroids:
+            asteroid.draw(WIN)
 
         player.draw(WIN, player.health)
 
         if lost:
-            lost_label = lost_font.render("Game over!", 1, (255, 255, 255))
+            lost_font = pygame.font.SysFont('Verdana', 60)
+            lost_label = lost_font.render("Game over!", 1, (255, 0, 0))
             WIN.blit(lost_label, (WIDTH / 2 - lost_label.get_width() / 2, 350))
 
         pygame.display.update()
@@ -347,6 +404,12 @@ def main():
             for j in range(health_wave_length):
                 health = Health(random.randrange(50, WIDTH-100), random.randrange(-1500, -100))
                 healths.append(health)
+            
+            # Asteroid
+            for j in range(asteroid_wave_length):
+                asteroid = Asteroid(random.randrange(50, WIDTH-100), random.randrange(-1500, -100))
+                asteroids.append(asteroid)
+
             if level != 1:
                 choose_new_weapon()
 
@@ -367,6 +430,18 @@ def main():
             player.y += player_vel
         if keys[pygame.K_SPACE]:
             player.shoot()
+
+        for asteroid in asteroids[:]:
+            asteroid.move(asteroid_vel)
+
+            """if collide(asteroid, player):
+                player.health = 0
+                lives = 0
+                asteroids.remove(asteroid)
+            elif asteroid.y + asteroid.get_height() > HEIGHT:
+                lives = 0
+                player.health = 0
+                asteroids.remove(asteroid)"""
 
         for enemy in enemies[:]:
             enemy.move(enemy_vel)
@@ -395,7 +470,7 @@ def main():
                     lives += 1
                 healths.remove(health)
 
-        player.move_lasers(-laser_vel, enemies)
+        player.move_lasers(-laser_vel, enemies, asteroids)
 
 
 weapon = "red"
@@ -445,7 +520,7 @@ def main_menu():
 
     while run:
         WIN.blit(BG, (0, 0))
-        title_label = title_font.render("Press the mouse to begin...", 1, (255, 255, 255))
+        title_label = title_font.render("Click for start", 1, (255, 255, 255))
         WIN.blit(title_label, (WIDTH / 2 - title_label.get_width() / 2, 350))
         pygame.display.update()
         for event in pygame.event.get():
