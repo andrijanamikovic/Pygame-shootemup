@@ -32,11 +32,15 @@ YELLOW_LASER = pygame.image.load(os.path.join("assets", "pixel_laser_yellow.png"
 # Background
 BG = pygame.transform.scale(pygame.image.load(os.path.join("assets", "background-black.png")), (WIDTH, HEIGHT))
 menu_theme = pygame_menu.themes.THEME_DARK
-menu = pygame_menu.Menu("Select a weapon", 300, 300, theme=menu_theme)
-
+menu_width = 500
+menu_height = 500
+# my_theme = pygame_menu.themes.Theme(background_color=(255, 255, 255, 255))
+menu = pygame_menu.Menu("Choose one", menu_width, menu_height, theme=menu_theme)
 # Health
 HEALTH = pygame.image.load(os.path.join("assets", "6-pixel-heart-1.png"))
 HEALTH = pygame.transform.scale(HEALTH, (70, 70))
+
+HIGH_SCORE = 0
 
 class Laser:
     def __init__(self, x, y, img):
@@ -232,6 +236,7 @@ player_vel = 5
 laser_vel = 5
 health_vel = 0
 player = Player(300, 630)
+health_wave_length = 0
 
 lost = False
 lost_count = 0
@@ -245,12 +250,14 @@ def main():
     global healths
     global wave_length
     global enemy_vel
+    global health_wave_length
     global health_vel
     global lost
     global lost_count
     global player_vel
     global laser_vel
     global player
+    global HIGH_SCORE
     if not init:
         level = 0
         lives = 5
@@ -270,8 +277,9 @@ def main():
         lost = False
         lost_count = 0
         init = True
-    main_font = pygame.font.SysFont("comicsans", 50)
-    lost_font = pygame.font.SysFont("comicsans", 60)
+
+    main_font = pygame.font.SysFont("arial", 40)
+    lost_font = pygame.font.SysFont("arial", 40)
     clock = pygame.time.Clock()
     player.change_laser_color(weapon)
 
@@ -282,9 +290,11 @@ def main():
     def redraw_window():
         WIN.blit(BG, (0, 0))
         # draw text
-        lives_label = main_font.render(f"Lives: {lives}", 1, (255, 255, 255))
+        lives_label = main_font.render(f"Enemies to miss: {lives}", 1, (255, 255, 255))
         level_label = main_font.render(f"Level: {level}", 1, (255, 255, 255))
+        high_score_label = main_font.render(f"High score: {HIGH_SCORE}", 1, (255, 255, 255))
 
+        WIN.blit(high_score_label, (WIDTH / 2.5 , 10))
         WIN.blit(lives_label, (10, 10))
         WIN.blit(level_label, (WIDTH - level_label.get_width() - 10, 10))
 
@@ -313,6 +323,8 @@ def main():
         if lost:
             if lost_count > FPS * 3:
                 run = False
+                if level > HIGH_SCORE:
+                    HIGH_SCORE = level
                 player.health = 100
                 init = False
             else:
@@ -320,7 +332,7 @@ def main():
 
         if len(enemies) == 0:
             level += 1
-            wave_length += 5
+            wave_length += 2
             for i in range(wave_length):
                 enemy = Enemy(random.randrange(50, WIDTH - 100), random.randrange(-1500, -100),
                               random.choice(["red", "black", "white"]))
@@ -377,6 +389,8 @@ def main():
                     player.health = 100
                 elif player.health + 30 <= 100:
                     player.health += 30
+                if lives < 5:
+                    lives += 1
                 healths.remove(health)
             # elif enemy.y + enemy.get_height() > HEIGHT:
             #     lives -= 1
@@ -416,11 +430,7 @@ def main_menu():
         }
     }
 
-    menu_theme = pygame_menu.themes.THEME_DARK
-    menu_width = 500
-    menu_height = 500
-    #my_theme = pygame_menu.themes.Theme(background_color=(255, 255, 255, 255))
-    menu = pygame_menu.Menu("Choose one", menu_width, menu_height, theme=menu_theme)
+
     menu.disable()
     for weapon_name in weapons.keys():
         print("weapon_name: ", weapon_name)
